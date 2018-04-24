@@ -1,0 +1,8 @@
+# jupyter config
+.ipynb_checkpoints
+
+# pycharm config
+InteractiveOptimisationAlgorithms/.idea
+
+# python
+InteractiveOptimisationAlgorithms/**/*.pyc

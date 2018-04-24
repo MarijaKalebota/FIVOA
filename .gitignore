@@ -2,7 +2,7 @@
 .ipynb_checkpoints
 
 # pycharm config
-InteractiveOptimisationAlgorithms/.idea
+FIVOA/.idea
 
 # python
-InteractiveOptimisationAlgorithms/**/*.pyc
+FIVOA/**/*.pyc

@@ -1,2 +1,1 @@
-# FIVOA
-# Framework for Interactive Visualization of Optimization Algorithms
+# FIVOA - Framework for Interactive Visualization of Optimization Algorithms

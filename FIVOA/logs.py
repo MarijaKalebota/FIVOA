@@ -20,3 +20,7 @@ class Iteration():
 
     def get_number_of_function_calls(self):
         return self.number_of_function_calls
+
+class Logger(object):
+    def __init__(self):
+        raise NotImplementedError

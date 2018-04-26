@@ -11,6 +11,10 @@ class HookeJeeves(IAlgorithm):
         self.factor = factor
         self.epsilon = epsilon
         self.print_me = print_me
+        self.logger = Logger(self.f)
+
+    def get_logger(self):
+        return self.logger
 
     #@staticmethod
     def run(self, initial_point):
@@ -20,7 +24,7 @@ class HookeJeeves(IAlgorithm):
         xp = initial_point.copy()
         xn = initial_point.copy()
         iteration_number = 0
-        logger = Logger(self.f)
+
         while (self.step > self.epsilon):
             additional_data = {}
             #find xn
@@ -66,7 +70,7 @@ class HookeJeeves(IAlgorithm):
             additional_data["xn"] = xn_tuple
 
             currentIteration = Iteration(iteration_number, self.f.valueAt(xn), xn, additional_data)
-            logger.addIteration(currentIteration)
+            self.logger.addIteration(currentIteration)
 
             if (self.f.valueAt(xn) < self.f.valueAt(xb)):
                 xp = xn.multiply_by_scalar(2) - xb
@@ -88,4 +92,4 @@ class HookeJeeves(IAlgorithm):
         print "Final solution of Hooke-Jeeves search for initial point " + str(initial_point.get_value_at_dimension(0)) + " is " + str(xb.getElements())
         output = open('HookeJeevesOutput.txt', 'w')
         output.write(output_string)
-        return xb, logger
+        return xb

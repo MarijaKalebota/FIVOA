@@ -12,7 +12,7 @@ class Iteration():
         return self.iteration_number
 
     def get_function_value(self):
-        return self.function_value
+        return self.function_value_in_current_solution
 
     def get_current_solution(self):
         return self.current_solution_point

@@ -15,8 +15,10 @@ class Point:
         return self.number_of_dimensions
 
     def copy(self):
-        new_elements = self.get_elements()
+        new_elements = []
         number_of_dimensions = self.get_number_of_dimensions()
+        for i in range(number_of_dimensions):
+            new_elements.append(self.get_value_at_dimension(i))
         new_point = Point(number_of_dimensions, new_elements)
         return new_point
 

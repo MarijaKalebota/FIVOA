@@ -18,7 +18,7 @@ class HookeJeeves(IAlgorithm):
 
     #@staticmethod
     def run(self, initial_point):
-        #f = open('HookeJeevesOutput.txt', 'w')
+        #function = open('HookeJeevesOutput.txt', 'w')
         output_string = ""
         xb = initial_point.copy()
         xp = initial_point.copy()
@@ -39,8 +39,8 @@ class HookeJeeves(IAlgorithm):
                 minus.set_value_at_dimension(minus.get_value_at_dimension(i) - self.step)
 
                 current_minimum = xn
-                #test = self.f.valueAt(plus)
-                #test2 = self.f.valueAt(minus)
+                #test = self.function.valueAt(plus)
+                #test2 = self.function.valueAt(minus)
                 if (self.f.valueAt(plus) < self.f.valueAt(current_minimum)):
                     current_minimum = plus
                 if (self.f.valueAt(minus) < self.f.valueAt(current_minimum)):
@@ -70,7 +70,7 @@ class HookeJeeves(IAlgorithm):
             additional_data["xn"] = xn_tuple
 
             currentIteration = Iteration(iteration_number, self.f.valueAt(xn), xn, additional_data)
-            self.logger.addIteration(currentIteration)
+            self.logger.add_iteration(currentIteration)
 
             if (self.f.valueAt(xn) < self.f.valueAt(xb)):
                 xp = xn.multiply_by_scalar(2) - xb

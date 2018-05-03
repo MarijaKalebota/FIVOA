@@ -14,6 +14,3 @@ class ExplicitConstraintForOneDimension(object):
             return False
         else:
             return True
-
-    def value_at(self, point):
-        raise NotImplementedError

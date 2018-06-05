@@ -22,7 +22,6 @@ class Drawer:
         self.constraints.append(constraint)
 
     def draw_2D_gaph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
-        function = self.logger.getFunction()
         plt.clf()
         plt.close('all')
         # TODO need this?
@@ -32,7 +31,7 @@ class Drawer:
         ax.set_autoscale_on(False)
 
         X = np.linspace(min_X1, max_X1, num=number_of_samples_of_domain)
-        Y = [function.valueAt(x) for x in X]
+        Y = [self.function.valueAt(x) for x in X]
         plt.plot(X, Y, 'b')
 
         # TODO constraints
@@ -43,7 +42,6 @@ class Drawer:
         plt.show()
 
     def draw_contour_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
-        function = self.logger.getFunction()
         plt.clf()
         plt.close('all')
         #TODO need this?

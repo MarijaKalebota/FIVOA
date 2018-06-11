@@ -21,7 +21,7 @@ class Drawer:
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
 
-    def draw_2D_gaph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    def draw_2D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
         plt.clf()
         plt.close('all')
         # TODO need this?
@@ -31,7 +31,7 @@ class Drawer:
         ax.set_autoscale_on(False)
 
         X = np.linspace(min_X1, max_X1, num=number_of_samples_of_domain)
-        Y = [self.function.valueAt(x) for x in X]
+        Y = [self.function.value_at(x) for x in X]
         plt.plot(X, Y, 'b')
 
         # TODO constraints
@@ -57,7 +57,7 @@ class Drawer:
 
         def create_Z(x, y, function):
             new_point = Point(2, [x, y])
-            return function.valueAt(new_point)
+            return function.value_at(new_point)
 
         Z = create_Z(X1, X2, self.function)
 
@@ -89,7 +89,7 @@ class Drawer:
                 #elements = np.array([[x1, x2]])
                 #matrix_x1_x2 = Matrix(1, 2, elements)
                 new_point = Point(2, [x1, x2])
-                Z.append(self.function.valueAt(new_point))
+                Z.append(self.function.value_at(new_point))
             Z_for_graph.append(Z)
         # endregion
 

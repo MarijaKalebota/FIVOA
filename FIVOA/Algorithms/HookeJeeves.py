@@ -39,11 +39,11 @@ class HookeJeeves(IAlgorithm):
                 minus.set_value_at_dimension(minus.get_value_at_dimension(i) - self.step)
 
                 current_minimum = xn
-                #test = self.function.valueAt(plus)
-                #test2 = self.function.valueAt(minus)
-                if (self.f.valueAt(plus) < self.f.valueAt(current_minimum)):
+                #test = self.function.value_at(plus)
+                #test2 = self.function.value_at(minus)
+                if (self.f.value_at(plus) < self.f.value_at(current_minimum)):
                     current_minimum = plus
-                if (self.f.valueAt(minus) < self.f.valueAt(current_minimum)):
+                if (self.f.value_at(minus) < self.f.value_at(current_minimum)):
                     current_minimum = minus
                 xn = current_minimum
 
@@ -69,10 +69,10 @@ class HookeJeeves(IAlgorithm):
             additional_data["xp"] = xp_tuple
             additional_data["xn"] = xn_tuple
 
-            currentIteration = Iteration(iteration_number, self.f.valueAt(xn), xn, additional_data)
+            currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data)
             self.logger.add_iteration(currentIteration)
 
-            if (self.f.valueAt(xn) < self.f.valueAt(xb)):
+            if (self.f.value_at(xn) < self.f.value_at(xb)):
                 xp = xn.multiply_by_scalar(2) - xb
 
                 xb = xn.copy()

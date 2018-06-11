@@ -77,7 +77,7 @@ class BoxAlgorithm(IAlgorithm):
             xh_index = 0
             xh2_index = 0
             for i in range(len(accepted_points)):
-                if(self.function.valueAt(accepted_points[i]) > self.function.valueAt(accepted_points[xh_index])):
+                if(self.function.value_at(accepted_points[i]) > self.function.value_at(accepted_points[xh_index])):
                     xh2_index = xh_index
                     xh_index = i
 
@@ -109,14 +109,14 @@ class BoxAlgorithm(IAlgorithm):
                 while (not self.implicit_constraints[i].is_satisfied(xr)):
                     xr = (xr + centroid).multiply_by_scalar(0.5)
 
-            if(self.function.valueAt(xr) > self.function.valueAt(accepted_points[xh2_index])):
+            if(self.function.value_at(xr) > self.function.value_at(accepted_points[xh2_index])):
                 xr = (xr + centroid).multiply_by_scalar(0.5)
 
             accepted_points[xh_index] = xr
 
             keepGoing = False
             for i in range(len(accepted_points)):
-                if(abs(self.function.valueAt(accepted_points[i]) - self.function.valueAt(centroid)) > self.epsilon):
+                if(abs(self.function.value_at(accepted_points[i]) - self.function.value_at(centroid)) > self.epsilon):
                     keepGoing = True
 
 
@@ -134,7 +134,7 @@ class BoxAlgorithm(IAlgorithm):
             additional_data["xr"] = xr_tuple
             additional_data["xc"] = xc_tuple
 
-            currentIteration = Iteration(iteration_number, self.function.valueAt(centroid), centroid, additional_data, self.function.get_number_of_function_calls)
+            currentIteration = Iteration(iteration_number, self.function.value_at(centroid), centroid, additional_data, self.function.get_number_of_function_calls)
             logger.add_iteration(currentIteration)
 
             iteration_number = iteration_number + 1

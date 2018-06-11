@@ -1,14 +1,25 @@
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-from Point import *
+#from Point import *
+#import Point
+from FIVOA.Point import *
+#from Point import Point
 import ipywidgets as widgets
 from ipywidgets import *
 from IPython.display import display
 import numbers
 
+
 class Drawer:
+    '''
     def __init__(self, logger):
         self.logger = logger
+        self.points = []
+        self.constraints = []
+        '''
+
+    def __init__(self):
         self.points = []
         self.constraints = []
 
@@ -31,14 +42,20 @@ class Drawer:
         ax.set_autoscale_on(False)
 
         X = np.linspace(min_X1, max_X1, num=number_of_samples_of_domain)
-        Y = [self.function.value_at(x) for x in X]
+        X_points = []
+        for x in X:
+            new_point = Point(1, [x])
+            X_points.append(new_point)
+        #Y = [self.function.value_at(x) for x in X]
+        #Y = [self.function.value_at(x) for x in X_points]
+        Y = [self.function.value_at(Point(1, [x])) for x in X]
         plt.plot(X, Y, 'b')
 
         # TODO constraints
 
         #plt.plot(x_value_of_current_optimum, y_value_of_current_optimum, 'ro')
         for point in self.points:
-            plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'ro')
+            plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), 'ro')
         plt.show()
 
     def draw_contour_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
@@ -104,8 +121,8 @@ class Drawer:
 
         # Plot all points from internal list
         for point in self.points:
-            ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1),
-                    point.get_value_at_dimension(2),
+            #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+            ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), self.function.value_at(point),
                     markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
         plt.show()
 

@@ -3,7 +3,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 #from Point import *
 #import Point
-from FIVOA.Point import *
+#from FIVOA.Point import *
+import os, sys
+parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+sys.path.append(parentddir)
+from Point import *
 #from Point import Point
 import ipywidgets as widgets
 from ipywidgets import *
@@ -122,7 +126,7 @@ class Drawer:
         # Plot all points from internal list
         for point in self.points:
             #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
-            ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), self.function.value_at(point),
+            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)],
                     markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
         plt.show()
 

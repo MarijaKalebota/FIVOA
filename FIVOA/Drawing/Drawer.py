@@ -13,6 +13,7 @@ import ipywidgets as widgets
 from ipywidgets import *
 from IPython.display import display
 import numbers
+from Constraints import *
 
 
 class Drawer:
@@ -35,6 +36,73 @@ class Drawer:
 
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
+
+    def is_within_margin(self, value, margin):
+        if abs(value) <= margin:
+            return True
+        else:
+            return False
+
+    def remove_constrained_area_from_main_graph(self, Z_for_graph, Z_of_constraint):
+        for i in range(len(Z_for_graph)):
+            for j in range(len(Z_for_graph[i])):
+                if np.isnan(Z_of_constraint[i][j]):
+                    # Z_for_graph should stay as it is
+                    pass
+                else:
+                    Z_for_graph[i][j] = np.nan
+        return Z_for_graph
+
+    def create_graph_data_for_explicit_constraint(self, X1_for_graph_before_meshgrid, X2_for_graph_before_meshgrid, constraint, this_is_for_X1):
+        Z_of_constraint = []
+
+        for x2 in X2_for_graph_before_meshgrid:
+            Z = []
+            for x1 in X1_for_graph_before_meshgrid:
+                if (this_is_for_X1):
+                    if (constraint.is_satisfied(x1) is True):
+                        Z.append(np.nan)
+                    else:
+                        point = Point(2, [x1, x2])
+                        Z.append(self.function.value_at(point))
+                else:
+                    if (constraint.is_satisfied(x2) is True):
+                        Z.append(np.nan)
+                    else:
+                        point = Point(2, [x1, x2])
+                        Z.append(self.function.value_at(point))
+            Z_of_constraint.append(Z)
+        return Z_of_constraint
+
+    def create_graph_data_for_equality_implicit_constraint(self, X1_for_graph_before_meshgrid, X2_for_graph_before_meshgrid, constraint):
+        Z_of_constraint = []
+        for x2 in X2_for_graph_before_meshgrid:
+            Z = []
+            for x1 in X1_for_graph_before_meshgrid:
+                point = Point(2, [x1, x2])
+                distance = constraint.value_at(point)
+                if (self.is_within_margin(distance, 5)):
+                    # Z.append(distance)
+                    Z.append(self.function.value_at(point))
+                else:
+                    Z.append(np.nan)
+            Z_of_constraint.append(Z)
+        return Z_of_constraint
+
+    def create_graph_data_for_inequality_implicit_constraint(self, X1_for_graph_before_meshgrid, X2_for_graph_before_meshgrid, constraint):
+        Z_of_constraint = []
+        for x2 in X2_for_graph_before_meshgrid:
+            Z = []
+            for x1 in X1_for_graph_before_meshgrid:
+                point = Point(2, [x1, x2])
+                if (constraint.is_satisfied(point) is True):
+                    Z.append(np.nan)
+                else:
+                    # Z.append(constraint.value_at(matrix_x1_x2))
+                    point = Point(2, [x1, x2])
+                    Z.append(self.function.value_at(point))
+            Z_of_constraint.append(Z)
+        return Z_of_constraint
 
     def draw_2D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
         plt.clf()
@@ -114,14 +182,28 @@ class Drawer:
             Z_for_graph.append(Z)
         # endregion
 
+        # TODO constraints
+        for constraint in self.constraints:
+            Z_of_constraint = []
+            if isinstance(constraint, IEqualityImplicitConstraint.IEqualityImplicitConstraint):
+                #pass
+                Z_of_constraint = self.create_graph_data_for_equality_implicit_constraint(X1_linspace, X2_linspace, constraint)
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=cmap)
+            elif isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+                #pass
+                Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=cmap)
+            else: #TODO explicit constraints?
+                pass
+
+            Z_for_graph = self.remove_constrained_area_from_main_graph(Z_for_graph, Z_of_constraint)
+
         # Plot fixed graph
         ax.contour3D(X1_for_graph, X2_for_graph, Z_for_graph, 50, cmap=cmap)
         # plt.plot([-1.9], [2.0], 'b')
         ax.set_xlabel('x1')
         ax.set_ylabel('x2')
         ax.set_zlabel('z')
-
-        #TODO constraints
 
         # Plot all points from internal list
         for point in self.points:

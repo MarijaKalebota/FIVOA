@@ -25,20 +25,20 @@ class Point:
     def multiply_by_scalar(self, scalar):
         new_point = self.copy()
         number_of_dimensions_of_point = new_point.get_number_of_dimensions()
-        for i in range(len(number_of_dimensions_of_point)):
+        for i in range(number_of_dimensions_of_point):
             new_point.set_value_at_dimension(i, new_point.get_value_at_dimension(i) * scalar)
         return new_point
 
     def __add__(self, other_point):
         new_point = self.copy()
         number_of_dimensions_of_point = new_point.get_number_of_dimensions()
-        for i in range(len(number_of_dimensions_of_point)):
+        for i in range(number_of_dimensions_of_point):
             new_point.set_value_at_dimension(i, new_point.get_value_at_dimension(i) + other_point.get_value_at_dimension(i))
         return new_point
 
     def __sub__(self, other_point):
         new_point = self.copy()
         number_of_dimensions_of_point = new_point.get_number_of_dimensions()
-        for i in range(len(number_of_dimensions_of_point)):
+        for i in range(number_of_dimensions_of_point):
             new_point.set_value_at_dimension(i, new_point.get_value_at_dimension(i) - other_point.get_value_at_dimension(i))
         return new_point

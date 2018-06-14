@@ -5,15 +5,22 @@ import matplotlib.pyplot as plt
 #import Point
 #from FIVOA.Point import *
 import os, sys
+
+
+
 parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parentddir)
+import Constraints
 from Point import *
 #from Point import Point
 import ipywidgets as widgets
 from ipywidgets import *
 from IPython.display import display
 import numbers
-from Constraints import *
+#from Constraints import *
+
+
+import inspect
 
 
 class Drawer:
@@ -137,6 +144,7 @@ class Drawer:
         plt.axis([min_X1, max_X1, min_X2, max_X2])
         ax = plt.gca()
         ax.set_autoscale_on(False)
+        alpha_value = 1. / len(self.constraints)
 
         X1_linspace = np.linspace(min_X1, max_X1, num=number_of_samples_of_domain)
         X2_linspace = np.linspace(min_X2, max_X2, num=number_of_samples_of_domain)
@@ -149,15 +157,56 @@ class Drawer:
 
         Z = create_Z(X1, X2, self.function)
 
-        plt.contourf(X1, X2, Z, 20, cmap='RdGy')
+        plt.contour(X1, X2, Z, 3, colors='black')
+        #add colour
+        plt.imshow(Z, extent=[min_X1, max_X1, min_X2, max_X2], origin='lower', cmap='GnBu', alpha=1)
         plt.colorbar();
 
+        #plt.contourf(X1, X2, Z, 20, cmap='RdGy')
+        #plt.colorbar();
+
         #TODO constraints
+
+        data_of_constraints = []
+
+        for constraint in self.constraints:
+            if isinstance(constraint, Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+                data_of_current_constraint = []
+                Z_of_constraint = []
+                for x2 in X2_linspace:
+                    Z = []
+                    for x1 in X1_linspace:
+                        point = Point(2, [x1, x2])
+                        if (constraint.is_satisfied(point) is True):
+                            Z.append(np.nan)
+                        else:
+                            Z.append(constraint.value_at(point))
+                    Z_of_constraint.append(Z)
+                X1_of_constraint, X2_of_constraint = np.meshgrid(X1_linspace, X2_linspace)
+
+                # plot_this_constraint
+                plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap='autumn', alpha=alpha_value)
+                plt.colorbar();
 
         #plt.plot(xRjesenja[iteration], yRjesenja[iteration], 'go')
         for point in self.points:
             plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'go')
         plt.show()
+
+
+    def is_inequality_constraint(self, constraint):
+        for element in inspect.getmro(type(constraint)):
+            if (
+                    Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__name__ == element.__name__ and Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__module__ in element.__module__):
+                return True
+        return False
+
+    def is_equality_constraint(self, constraint):
+        for element in inspect.getmro(type(constraint)):
+            if (
+                    Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint.__name__ == element.__name__ and Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint.__module__ in element.__module__):
+                return True
+        return False
 
     def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, cmap):
         plt.clf()
@@ -185,14 +234,22 @@ class Drawer:
         #print(self.constraints)
         # TODO constraints
         for constraint in self.constraints:
-            print(constraint)
+            #for element in inspect.getmro(type(constraint)):
+               # if(Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__name__ == element.__name__  and  Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__module__ in element.__module__):
+              #      return True
+            #return True
+#
+            print inspect.getmro(type(constraint))
+            print inspect.getmro(type(constraint))[1] == Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint
+            print("moje ime je " + type(constraint).__module__ + type(constraint).__name__)
             print(type(constraint))
             print (type(constraint))
-            print(issubclass(type(constraint), IInequalityImplicitConstraint.IInequalityImplicitConstraint))
+            print(issubclass(type(constraint), Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint))
             Z_of_constraint = []
 
             #if isinstance(constraint, IEqualityImplicitConstraint.IEqualityImplicitConstraint):
-            if issubclass(type(constraint), IEqualityImplicitConstraint.IEqualityImplicitConstraint):
+            #if issubclass(type(constraint), Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint):
+            if self.is_equality_constraint(constraint):
                 #pass
                 Z_of_constraint = self.create_graph_data_for_equality_implicit_constraint(X1_linspace, X2_linspace, constraint)
                 for i in range(len(Z_for_graph)):
@@ -206,7 +263,8 @@ class Drawer:
                 #plt.show()
             #elif isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint):
             #elif isinstance(constraint, InequalityImplicitConstraint1.InequalityImplicitConstraint1):
-            elif issubclass(type(constraint), IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+            #elif issubclass(type(constraint), Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+            elif self.is_inequality_constraint(constraint):
                 #pass
                 Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
                 for i in range(len(Z_for_graph)):

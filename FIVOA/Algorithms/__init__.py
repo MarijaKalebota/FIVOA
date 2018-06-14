@@ -1,2 +1,3 @@
 import IAlgorithm
 import HookeJeeves
+import BoxAlgorithm

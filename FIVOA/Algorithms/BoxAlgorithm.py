@@ -100,10 +100,10 @@ class BoxAlgorithm(IAlgorithm):
                 #if(xr.getElement(0,i) < self.lower_bounds[i]):
                 lower_bound = self.explicit_constraints[i].get_lower_bound()
                 upper_bound = self.explicit_constraints[i].get_upper_bound()
-                if (xr.getElement(0, i) < lower_bound):
-                    xr.getElements()[0][i] = lower_bound
-                elif(xr.getElements()[0][i] > upper_bound):
-                    xr.getElements()[0][i] = upper_bound
+                if (xr.get_value_at_dimension(i) < lower_bound):
+                    xr.set_value_at_dimension(i, lower_bound)
+                elif(xr.get_value_at_dimension(i) > upper_bound):
+                    xr.set_value_at_dimension(i, upper_bound)
 
             for i in range(len(self.implicit_constraints)):
                 while (not self.implicit_constraints[i].is_satisfied(xr)):
@@ -134,7 +134,7 @@ class BoxAlgorithm(IAlgorithm):
             additional_data["xr"] = xr_tuple
             additional_data["xc"] = xc_tuple
 
-            currentIteration = Iteration(iteration_number, self.function.value_at(centroid), centroid, additional_data, self.function.get_number_of_function_calls)
+            currentIteration = Iteration(iteration_number, self.function.value_at(centroid), centroid, additional_data, self.function.get_number_of_calls())
             logger.add_iteration(currentIteration)
 
             iteration_number = iteration_number + 1

@@ -99,7 +99,6 @@ class Drawer:
                     Z.append(np.nan)
                 else:
                     # Z.append(constraint.value_at(matrix_x1_x2))
-                    point = Point(2, [x1, x2])
                     Z.append(self.function.value_at(point))
             Z_of_constraint.append(Z)
         return Z_of_constraint
@@ -182,21 +181,51 @@ class Drawer:
             Z_for_graph.append(Z)
         # endregion
 
+
+        #print(self.constraints)
         # TODO constraints
         for constraint in self.constraints:
+            print(constraint)
+            print(type(constraint))
+            print (type(constraint))
+            print(issubclass(type(constraint), IInequalityImplicitConstraint.IInequalityImplicitConstraint))
             Z_of_constraint = []
-            if isinstance(constraint, IEqualityImplicitConstraint.IEqualityImplicitConstraint):
+
+            #if isinstance(constraint, IEqualityImplicitConstraint.IEqualityImplicitConstraint):
+            if issubclass(type(constraint), IEqualityImplicitConstraint.IEqualityImplicitConstraint):
                 #pass
                 Z_of_constraint = self.create_graph_data_for_equality_implicit_constraint(X1_linspace, X2_linspace, constraint)
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=cmap)
-            elif isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+                for i in range(len(Z_for_graph)):
+                    for j in range(len(Z_for_graph[i])):
+                        if np.isnan(Z_of_constraint[i][j]):
+                            # Z_for_graph should stay as it is
+                            pass
+                        else:
+                            Z_for_graph[i][j] = np.nan
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
+                #plt.show()
+            #elif isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+            #elif isinstance(constraint, InequalityImplicitConstraint1.InequalityImplicitConstraint1):
+            elif issubclass(type(constraint), IInequalityImplicitConstraint.IInequalityImplicitConstraint):
                 #pass
                 Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=cmap)
+                for i in range(len(Z_for_graph)):
+                    for j in range(len(Z_for_graph[i])):
+                        if np.isnan(Z_of_constraint[i][j]):
+                            # Z_for_graph should stay as it is
+                            pass
+                        else:
+                            Z_for_graph[i][j] = np.nan
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
+
+                print Z_of_constraint
+                #plt.show()
             else: #TODO explicit constraints?
+                #raise AssertionError(isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint))
+                print "else"
                 pass
 
-            Z_for_graph = self.remove_constrained_area_from_main_graph(Z_for_graph, Z_of_constraint)
+            #Z_for_graph = self.remove_constrained_area_from_main_graph(Z_for_graph, Z_of_constraint)
 
         # Plot fixed graph
         ax.contour3D(X1_for_graph, X2_for_graph, Z_for_graph, 50, cmap=cmap)
@@ -208,7 +237,6 @@ class Drawer:
         # Plot all points from internal list
         for point in self.points:
             #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
-            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)],
-                    markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
         plt.show()
 

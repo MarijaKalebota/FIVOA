@@ -9,8 +9,8 @@ class Logger(object):
         self.iterations.append(iteration)
 
     def get_iteration(self, index):
-        if(len(self.iterations) >= index):
-            return "Index out of range"
+        if(index >= len(self.iterations)):
+            raise IndexError("That index is bigger than the maximum number of iterations")
         else:
             return self.iterations[index]
 

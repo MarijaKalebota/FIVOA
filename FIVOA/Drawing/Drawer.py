@@ -31,13 +31,16 @@ class Drawer:
         self.constraints = []
         '''
 
-    def __init__(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    #def __init__(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    def __init__(self):
         self.points = []
         self.constraints = []
         self.number_of_samples_of_domain = 150
         self.ranges_of_variables = [ [-10, 10],
                                      [-15, 15]
                                      ]
+        self.cmap = 'Accent'
+        self.figure_number = 0
 
     def add_function(self, function):
         self.function = function
@@ -60,6 +63,15 @@ class Drawer:
     def set_number_of_samples_of_domain(self, number_of_samples_of_domain):
         #TODO maybe make this an array - to be able to sample different variables differently?
         self.number_of_samples_of_domain = number_of_samples_of_domain
+
+    def get_number_of_samples_of_domain(self):
+        return self.number_of_samples_of_domain
+
+    def set_cmap(self, cmap):
+        self.cmap = cmap
+
+    def set_figure_number(self, fig_num):
+        self.figure_number = fig_num
 
     def is_within_margin(self, value, margin):
         if abs(value) <= margin:
@@ -239,12 +251,14 @@ class Drawer:
         return False
 
     #def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, cmap):
-    def draw_3D_graph(self, cmap):
+    #def draw_3D_graph(self, cmap):
+    def draw_3D_graph(self):
         plt.clf()
         plt.close('all')
-        #plt.figure(iteration_number)
+        plt.figure(self.figure_number)
         ax = plt.axes(projection='3d')
 
+        cmap = self.cmap
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
         min_X2 = self.ranges_of_variables[1][0]

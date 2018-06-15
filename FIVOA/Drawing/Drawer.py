@@ -31,9 +31,13 @@ class Drawer:
         self.constraints = []
         '''
 
-    def __init__(self):
+    def __init__(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
         self.points = []
         self.constraints = []
+        self.number_of_samples_of_domain = 150
+        self.ranges_of_variables = [ [-10, 10],
+                                     [-15, 15]
+                                     ]
 
     def add_function(self, function):
         self.function = function
@@ -46,6 +50,13 @@ class Drawer:
 
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
+
+    def set_ranges_of_variables(self, ranges):
+        self.ranges_of_variables = ranges
+
+    def set_number_of_samples_of_domain(self, number_of_samples_of_domain):
+        #TODO maybe make this an array - to be able to sample different variables differently?
+        self.number_of_samples_of_domain = number_of_samples_of_domain
 
     def is_within_margin(self, value, margin):
         if abs(value) <= margin:
@@ -113,16 +124,23 @@ class Drawer:
             Z_of_constraint.append(Z)
         return Z_of_constraint
 
-    def draw_2D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    #def draw_2D_graph(self, min_X, max_X, min_Y, max_Y, number_of_samples_of_domain):
+    def draw_2D_graph(self):
         plt.clf()
         plt.close('all')
         # TODO need this?
         #plt.figure(iteration)
-        plt.axis([min_X1, max_X1, min_X2, max_X2])
+        min_X = self.ranges_of_variables[0][0]
+        max_X = self.ranges_of_variables[0][1]
+        min_Y = self.ranges_of_variables[1][0]
+        max_Y = self.ranges_of_variables[1][1]
+        number_of_samples_of_domain = self.number_of_samples_of_domain
+
+        plt.axis([min_X, max_X, min_Y, max_Y])
         ax = plt.gca()
         ax.set_autoscale_on(False)
 
-        X = np.linspace(min_X1, max_X1, num=number_of_samples_of_domain)
+        X = np.linspace(min_X, max_X, num=number_of_samples_of_domain)
         X_points = []
         for x in X:
             new_point = Point(1, [x])
@@ -132,18 +150,25 @@ class Drawer:
         Y = [self.function.value_at(Point(1, [x])) for x in X]
         plt.plot(X, Y, 'b')
 
-        # TODO constraints
+        # not drawing 2D constraints in this version
 
         #plt.plot(x_value_of_current_optimum, y_value_of_current_optimum, 'ro')
         for point in self.points:
             plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), 'ro')
         plt.show()
 
-    def draw_contour_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    #def draw_contour_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
+    def draw_contour_graph(self):
         plt.clf()
         plt.close('all')
         #TODO need this?
         #plt.figure(iteration)
+        min_X1 = self.ranges_of_variables[0][0]
+        max_X1 = self.ranges_of_variables[0][1]
+        min_X2 = self.ranges_of_variables[1][0]
+        max_X2 = self.ranges_of_variables[1][1]
+        number_of_samples_of_domain = self.number_of_samples_of_domain
+
         plt.axis([min_X1, max_X1, min_X2, max_X2])
         ax = plt.gca()
         ax.set_autoscale_on(False)
@@ -196,28 +221,34 @@ class Drawer:
             plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'go')
         plt.show()
 
-
-    def is_inequality_constraint(self, constraint):
+    def is_inequality_implicit_constraint(self, constraint):
         for element in inspect.getmro(type(constraint)):
             if (
                     Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__name__ == element.__name__ and Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__module__ in element.__module__):
                 return True
         return False
 
-    def is_equality_constraint(self, constraint):
+    def is_equality_implicit_constraint(self, constraint):
         for element in inspect.getmro(type(constraint)):
             if (
                     Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint.__name__ == element.__name__ and Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint.__module__ in element.__module__):
                 return True
         return False
 
-    def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, cmap):
+    #def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, cmap):
+    def draw_3D_graph(self, cmap):
         plt.clf()
         plt.close('all')
         #plt.figure(iteration_number)
         ax = plt.axes(projection='3d')
 
-        # region Create fixed arrays for graph
+        min_X1 = self.ranges_of_variables[0][0]
+        max_X1 = self.ranges_of_variables[0][1]
+        min_X2 = self.ranges_of_variables[1][0]
+        max_X2 = self.ranges_of_variables[1][1]
+        number_of_samples_of_domain = self.number_of_samples_of_domain
+
+        # region Create data for plotting the graph of the function
         X1_linspace = np.linspace(min_X1, max_X1, number_of_samples_of_domain)
         X2_linspace = np.linspace(min_X2, max_X2, number_of_samples_of_domain)
 
@@ -226,34 +257,16 @@ class Drawer:
         for x2 in X2_linspace:
             Z = []
             for x1 in X1_linspace:
-                #elements = np.array([[x1, x2]])
-                #matrix_x1_x2 = Matrix(1, 2, elements)
                 new_point = Point(2, [x1, x2])
                 Z.append(self.function.value_at(new_point))
             Z_for_graph.append(Z)
         # endregion
 
-
-        #print(self.constraints)
-        # TODO constraints
+        #region Plot constraints
         for constraint in self.constraints:
-            #for element in inspect.getmro(type(constraint)):
-               # if(Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__name__ == element.__name__  and  Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint.__module__ in element.__module__):
-              #      return True
-            #return True
-#
-            print inspect.getmro(type(constraint))
-            print inspect.getmro(type(constraint))[1] == Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint
-            print("moje ime je " + type(constraint).__module__ + type(constraint).__name__)
-            print(type(constraint))
-            print (type(constraint))
-            print(issubclass(type(constraint), Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint))
             Z_of_constraint = []
 
-            #if isinstance(constraint, IEqualityImplicitConstraint.IEqualityImplicitConstraint):
-            #if issubclass(type(constraint), Constraints.IEqualityImplicitConstraint.IEqualityImplicitConstraint):
-            if self.is_equality_constraint(constraint):
-                #pass
+            if self.is_equality_implicit_constraint(constraint):
                 Z_of_constraint = self.create_graph_data_for_equality_implicit_constraint(X1_linspace, X2_linspace, constraint)
                 for i in range(len(Z_for_graph)):
                     for j in range(len(Z_for_graph[i])):
@@ -263,12 +276,8 @@ class Drawer:
                         else:
                             Z_for_graph[i][j] = np.nan
                 ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
-                #plt.show()
-            #elif isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint):
-            #elif isinstance(constraint, InequalityImplicitConstraint1.InequalityImplicitConstraint1):
-            #elif issubclass(type(constraint), Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint):
-            elif self.is_inequality_constraint(constraint):
-                #pass
+
+            elif self.is_inequality_implicit_constraint(constraint):
                 Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
                 for i in range(len(Z_for_graph)):
                     for j in range(len(Z_for_graph[i])):
@@ -278,26 +287,24 @@ class Drawer:
                         else:
                             Z_for_graph[i][j] = np.nan
                 ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
-
-                print Z_of_constraint
-                #plt.show()
             else: #TODO explicit constraints?
-                #raise AssertionError(isinstance(constraint, IInequalityImplicitConstraint.IInequalityImplicitConstraint))
-                print "else"
                 pass
 
             #Z_for_graph = self.remove_constrained_area_from_main_graph(Z_for_graph, Z_of_constraint)
+        #endregion
 
-        # Plot fixed graph
+        #region Plot graph of the function
         ax.contour3D(X1_for_graph, X2_for_graph, Z_for_graph, 50, cmap=cmap)
-        # plt.plot([-1.9], [2.0], 'b')
         ax.set_xlabel('x1')
         ax.set_ylabel('x2')
         ax.set_zlabel('z')
+        #endregion
 
-        # Plot all points from internal list
+        #region Plot all points from internal list
         for point in self.points:
             #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
             ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+        #endregion
+
         plt.show()
 

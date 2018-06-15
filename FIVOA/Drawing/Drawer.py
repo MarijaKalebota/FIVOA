@@ -54,6 +54,9 @@ class Drawer:
     def set_ranges_of_variables(self, ranges):
         self.ranges_of_variables = ranges
 
+    def get_range_of_variable(self, index_of_variable):
+        return self.ranges_of_variables[index_of_variable]
+
     def set_number_of_samples_of_domain(self, number_of_samples_of_domain):
         #TODO maybe make this an array - to be able to sample different variables differently?
         self.number_of_samples_of_domain = number_of_samples_of_domain

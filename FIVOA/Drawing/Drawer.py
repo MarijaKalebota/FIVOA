@@ -40,6 +40,7 @@ class Drawer:
                                      [-15, 15]
                                      ]
         self.cmap = 'Accent'
+        self.constraints_colormap = 'autumn'
         self.figure_number = 0
 
     def add_function(self, function):
@@ -69,6 +70,9 @@ class Drawer:
 
     def set_cmap(self, cmap):
         self.cmap = cmap
+
+    def set_constraints_cmap(self, cmap):
+        self.constraints_colormap = cmap
 
     def set_figure_number(self, fig_num):
         self.figure_number = fig_num
@@ -178,6 +182,8 @@ class Drawer:
         plt.close('all')
         #TODO need this?
         #plt.figure(iteration)
+        cmap = self.cmap
+        constraints_cmap = self.constraints_colormap
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
         min_X2 = self.ranges_of_variables[1][0]
@@ -202,7 +208,7 @@ class Drawer:
 
         plt.contour(X1, X2, Z, 3, colors='black')
         #add colour
-        plt.imshow(Z, extent=[min_X1, max_X1, min_X2, max_X2], origin='lower', cmap='GnBu', alpha=1)
+        plt.imshow(Z, extent=[min_X1, max_X1, min_X2, max_X2], origin='lower', cmap=cmap, alpha=1)
         plt.colorbar();
 
         #plt.contourf(X1, X2, Z, 20, cmap='RdGy')
@@ -213,7 +219,7 @@ class Drawer:
         data_of_constraints = []
 
         for constraint in self.constraints:
-            if isinstance(constraint, Constraints.IInequalityImplicitConstraint.IInequalityImplicitConstraint):
+            if self.is_inequality_implicit_constraint(constraint):
                 data_of_current_constraint = []
                 Z_of_constraint = []
                 for x2 in X2_linspace:
@@ -228,7 +234,7 @@ class Drawer:
                 X1_of_constraint, X2_of_constraint = np.meshgrid(X1_linspace, X2_linspace)
 
                 # plot_this_constraint
-                plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap='autumn', alpha=alpha_value)
+                plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap=constraints_cmap, alpha=alpha_value)
                 plt.colorbar();
 
         #plt.plot(xRjesenja[iteration], yRjesenja[iteration], 'go')

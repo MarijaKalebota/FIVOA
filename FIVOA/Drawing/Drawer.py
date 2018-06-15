@@ -41,6 +41,9 @@ class Drawer:
     def add_point(self, point):
         self.points.append(point)
 
+    def clear_points(self):
+        self.points = []
+
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
 

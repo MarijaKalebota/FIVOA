@@ -5,7 +5,8 @@ class Animator:
     def __init__(self):
         pass
 
-    #def create_slider(self, ):
+    def create_int_slider(self, value=7, min=0, max=10, step=1, description='Test:', disabled=False, continuous_update=False, orientation='horizontal', readout=True, readout_format='d'):
+        return widgets.IntSlider(self, value=value, min = min, max = max, step = step, description = description, disabled = disabled, continuous_update = continuous_update, orientation = orientation, readout = readout, readout_format = readout_format)
 
     def create_play_widget_with_next_and_previous_buttons(self, play_max_of_interval):
         play = widgets.Play(

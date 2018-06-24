@@ -33,10 +33,10 @@ class HookeJeeves(IAlgorithm):
             for i in range(xn.get_number_of_dimensions()):
                 plus = xn.copy()
                 #plus.getElements()[0,i] = plus.getElements()[0,i] + self.step
-                plus.set_value_at_dimension(plus.get_value_at_dimension(i) + self.step)
+                plus.set_value_at_dimension(i, plus.get_value_at_dimension(i) + self.step)
                 minus = xn.copy()
                 #minus.getElements()[0,i] = minus.getElements()[0,i] - self.step
-                minus.set_value_at_dimension(minus.get_value_at_dimension(i) - self.step)
+                minus.set_value_at_dimension(i, minus.get_value_at_dimension(i) - self.step)
 
                 current_minimum = xn
                 #test = self.function.value_at(plus)
@@ -69,7 +69,8 @@ class HookeJeeves(IAlgorithm):
             additional_data["xp"] = xp_tuple
             additional_data["xn"] = xn_tuple
 
-            currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data)
+            #currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data)
+            currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data, self.f.get_number_of_calls())
             self.logger.add_iteration(currentIteration)
 
             if (self.f.value_at(xn) < self.f.value_at(xb)):
@@ -82,14 +83,14 @@ class HookeJeeves(IAlgorithm):
                 if (self.print_me):
                     print "Changing step to " + str(self.step)
                 xp = xb.copy()
-                xn = xp.copy
+                xn = xp.copy()
 
             iteration_number = iteration_number + 1
             output_string = output_string + str(xn.get_value_at_dimension(0))
             for i in range(1, xn.get_number_of_dimensions()):
                 output_string = output_string + " " + str(xn.get_value_at_dimension(i))
             output_string = output_string + "\n"
-        print "Final solution of Hooke-Jeeves search for initial point " + str(initial_point.get_value_at_dimension(0)) + " is " + str(xb.getElements())
+        print "Final solution of Hooke-Jeeves search for initial point " + str(initial_point.get_value_at_dimension(0)) + " is " + str(xb)
         output = open('HookeJeevesOutput.txt', 'w')
         output.write(output_string)
-        return xb
+        return xb, self.logger

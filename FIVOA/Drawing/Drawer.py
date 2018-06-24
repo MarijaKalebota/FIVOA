@@ -174,6 +174,9 @@ class Drawer:
         #plt.plot(x_value_of_current_optimum, y_value_of_current_optimum, 'ro')
         for point in self.points:
             plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), 'ro')
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
+        #plt.title('Title')
         plt.show()
 
     #def draw_contour_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):

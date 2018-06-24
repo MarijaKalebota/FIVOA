@@ -5,13 +5,13 @@ from Logging.Iteration import *
 
 class HookeJeeves(IAlgorithm):
 
-    def __init__(self, f, step, factor, epsilon, print_me):
-        self.f = f
+    def __init__(self, function, step, factor, epsilon):
+        self.function = function
         self.step = step
         self.factor = factor
         self.epsilon = epsilon
-        self.print_me = print_me
-        self.logger = Logger(self.f)
+        #self.print_me = print_me
+        self.logger = Logger(self.function)
 
     def get_logger(self):
         return self.logger
@@ -28,8 +28,8 @@ class HookeJeeves(IAlgorithm):
         while (self.step > self.epsilon):
             additional_data = {}
             #find xn
-            if (self.print_me):
-                print "Iteration: " + str(iteration_number + 1)
+            #if (self.print_me):
+                #print "Iteration: " + str(iteration_number + 1)
             for i in range(xn.get_number_of_dimensions()):
                 plus = xn.copy()
                 #plus.getElements()[0,i] = plus.getElements()[0,i] + self.step
@@ -41,12 +41,12 @@ class HookeJeeves(IAlgorithm):
                 current_minimum = xn
                 #test = self.function.value_at(plus)
                 #test2 = self.function.value_at(minus)
-                if (self.f.value_at(plus) < self.f.value_at(current_minimum)):
+                if (self.function.value_at(plus) < self.function.value_at(current_minimum)):
                     current_minimum = plus
-                if (self.f.value_at(minus) < self.f.value_at(current_minimum)):
+                if (self.function.value_at(minus) < self.function.value_at(current_minimum)):
                     current_minimum = minus
                 xn = current_minimum
-
+            '''
             if (self.print_me):
                 #TODO printing
                 print "xb = "
@@ -56,6 +56,7 @@ class HookeJeeves(IAlgorithm):
                 print "\txn = "
                 #Matrix.printMatrix(xn)
                 print "Step = " + str(self.step)
+            '''
 
             xb_description = "xb - Bazna tocka algoritma Hooke-Jeeves"
             xp_description = "xp - Tocka pretrazivanja algoritma Hooke-Jeeves u trenutnoj iteraciji. xp' = 2*xn + xb"
@@ -69,19 +70,19 @@ class HookeJeeves(IAlgorithm):
             additional_data["xp"] = xp_tuple
             additional_data["xn"] = xn_tuple
 
-            #currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data)
-            currentIteration = Iteration(iteration_number, self.f.value_at(xn), xn, additional_data, self.f.get_number_of_calls())
+            #currentIteration = Iteration(iteration_number, self.function.value_at(xn), xn, additional_data)
+            currentIteration = Iteration(iteration_number, self.function.value_at(xn), xn, additional_data, self.function.get_number_of_calls())
             self.logger.add_iteration(currentIteration)
 
-            if (self.f.value_at(xn) < self.f.value_at(xb)):
+            if (self.function.value_at(xn) < self.function.value_at(xb)):
                 xp = xn.multiply_by_scalar(2) - xb
 
                 xb = xn.copy()
                 xn = xp.copy()
             else:
                 self.step = self.step * self.factor
-                if (self.print_me):
-                    print "Changing step to " + str(self.step)
+                #if (self.print_me):
+                    #print "Changing step to " + str(self.step)
                 xp = xb.copy()
                 xn = xp.copy()
 
@@ -91,6 +92,6 @@ class HookeJeeves(IAlgorithm):
                 output_string = output_string + " " + str(xn.get_value_at_dimension(i))
             output_string = output_string + "\n"
         print "Final solution of Hooke-Jeeves search for initial point " + str(initial_point.get_value_at_dimension(0)) + " is " + str(xb)
-        output = open('HookeJeevesOutput.txt', 'w')
-        output.write(output_string)
+        #output = open('HookeJeevesOutput.txt', 'w')
+        #output.write(output_string)
         return xb, self.logger

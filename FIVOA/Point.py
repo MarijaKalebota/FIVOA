@@ -42,3 +42,6 @@ class Point:
         for i in range(number_of_dimensions_of_point):
             new_point.set_value_at_dimension(i, new_point.get_value_at_dimension(i) - other_point.get_value_at_dimension(i))
         return new_point
+
+    def __str__(self):
+        return str(self.elements)

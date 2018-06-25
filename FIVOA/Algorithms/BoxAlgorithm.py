@@ -8,7 +8,8 @@ from Logging.Iteration import *
 class BoxAlgorithm(IAlgorithm):
 
     #def __init__(self, function, lower_bounds, upper_bounds, implicit_constraints, epsilon, alpha, print_me):
-    def __init__(self, function, explicit_constraints, implicit_constraints, epsilon, alpha, print_me):
+    #def __init__(self, function, explicit_constraints, implicit_constraints, epsilon, alpha, print_me):
+    def __init__(self, function, explicit_constraints, implicit_constraints, epsilon, alpha):
         self.function = function
         #self.lower_bounds = lower_bounds
         #self.upper_bounds = upper_bounds
@@ -16,29 +17,32 @@ class BoxAlgorithm(IAlgorithm):
         self.implicit_constraints = implicit_constraints
         self.epsilon = epsilon
         self.alpha = alpha
-        self.print_me = print_me
+        #self.print_me = print_me
 
     @staticmethod
     def reflect(xc, xh, alpha):
         return xc.multiply_by_scalar(1 + alpha) - xh.multiply_by_scalar(alpha)
 
+    def get_logger(self):
+        return self.logger
 
-    def run(self, point):
+
+    def run(self, initial_point):
         additional_data = {}
 
-        n = point.get_number_of_dimensions()
+        n = initial_point.get_number_of_dimensions()
 
         for i in range(n):
-            #if(point.getElement(0, i) < self.lower_bounds[i] or point.getElement(0, i) > self.upper_bounds[i]):
-            if not self.explicit_constraints[i].is_satisfied(point.get_value_at_dimension(i)):
-                print "The given point is not within the explicit constraints."
+            #if(initial_point.getElement(0, i) < self.lower_bounds[i] or initial_point.getElement(0, i) > self.upper_bounds[i]):
+            if not self.explicit_constraints[i].is_satisfied(initial_point.get_value_at_dimension(i)):
+                print "The given initial_point is not within the explicit constraints."
                 return
 
-        centroid = point.copy()
+        centroid = initial_point.copy()
 
         accepted_points = []
 
-        accepted_points.append(point)
+        accepted_points.append(initial_point)
 
         for t in range(2*n):
             elements = []
@@ -47,19 +51,19 @@ class BoxAlgorithm(IAlgorithm):
                 R = random.uniform(0, 1)
                 elements[i] = self.explicit_constraints[i].get_lower_bound() + R * (self.explicit_constraints[i].get_upper_bound() - self.explicit_constraints[i].get_lower_bound())
 
-            new_point = Point(n, elements)
+            new_point = Point(elements)
             for j in range(len(self.implicit_constraints)):
                 while (not self.implicit_constraints[j].is_satisfied(new_point)):
                     new_point = (new_point + centroid).multiply_by_scalar(0.5)
 
             accepted_points.append(new_point)
 
-            #calculate new centroid (with new accepted point)
+            #calculate new centroid (with new accepted initial_point)
             sum_elements = []
             for i in range(n):
                 sum_elements.append(0)
 
-            sum = Point(n, sum_elements)
+            sum = Point(sum_elements)
             for i in range(len(accepted_points)):
                 sum = sum + accepted_points[i]
             #centroid = sum/(simplex.length - 2);
@@ -85,7 +89,7 @@ class BoxAlgorithm(IAlgorithm):
             sum_elements = []
             for i in range(n):
                 sum_elements.append(0)
-            sum = Point(n, sum_elements)
+            sum = Point(sum_elements)
             #for (int i = 0; i < accepted_points.size(); i++) {
             for i in range(len(accepted_points)):
                 if( i == xh_index):
@@ -122,8 +126,8 @@ class BoxAlgorithm(IAlgorithm):
 
             #TODO check if this is the correct place to log the additional_data points
 
-            xh_description = "xh - The point in which the function value is highest"
-            xr_description = "xr - Reflected point"
+            xh_description = "xh - The initial_point in which the function value is highest"
+            xr_description = "xr - Reflected initial_point"
             xc_description = "xc - Centroid"
 
             xh_tuple = (accepted_points[xh_index], xh_description)

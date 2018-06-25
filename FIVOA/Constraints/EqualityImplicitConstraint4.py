@@ -9,3 +9,6 @@ class EqualityImplicitConstraint4(IEqualityImplicitConstraint):
 
     def value_at(self, point):
         return point.get_value_at_dimension(1) - point.get_value_at_dimension(0) + 50
+
+    def get_gradient(self):
+        raise NotImplementedError

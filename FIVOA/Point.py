@@ -1,8 +1,8 @@
 import numpy as np
 
 class Point:
-    def __init__(self, number_of_dimensions, elements):
-        self.number_of_dimensions = number_of_dimensions
+    def __init__(self, elements):
+        self.number_of_dimensions = len(elements)
         self.elements = elements
 
     def get_value_at_dimension(self, index):
@@ -19,7 +19,7 @@ class Point:
         number_of_dimensions = self.get_number_of_dimensions()
         for i in range(number_of_dimensions):
             new_elements.append(self.get_value_at_dimension(i))
-        new_point = Point(number_of_dimensions, new_elements)
+        new_point = Point(new_elements)
         return new_point
 
     def multiply_by_scalar(self, scalar):

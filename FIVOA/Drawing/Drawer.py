@@ -42,6 +42,8 @@ class Drawer:
         self.cmap = 'Accent'
         self.constraints_colormap = 'autumn'
         self.figure_number = 0
+        self.twoD_graph_function_colour = 'b'
+        self.twoD_graph_point_style = 'go'
 
     def add_function(self, function):
         self.function = function
@@ -74,6 +76,12 @@ class Drawer:
     def set_constraints_cmap(self, cmap):
         self.constraints_colormap = cmap
 
+    def set_2D_graph_function_colour(self, colour):
+        self.twoD_graph_function_colour = colour
+
+    def set_2D_graph_point_style(self, point_style):
+        self.twoD_graph_point_style = point_style
+
     def set_figure_number(self, fig_num):
         self.figure_number = fig_num
 
@@ -103,13 +111,13 @@ class Drawer:
                     if (constraint.is_satisfied(x1) is True):
                         Z.append(np.nan)
                     else:
-                        point = Point(2, [x1, x2])
+                        point = Point([x1, x2])
                         Z.append(self.function.value_at(point))
                 else:
                     if (constraint.is_satisfied(x2) is True):
                         Z.append(np.nan)
                     else:
-                        point = Point(2, [x1, x2])
+                        point = Point([x1, x2])
                         Z.append(self.function.value_at(point))
             Z_of_constraint.append(Z)
         return Z_of_constraint
@@ -119,7 +127,7 @@ class Drawer:
         for x2 in X2_for_graph_before_meshgrid:
             Z = []
             for x1 in X1_for_graph_before_meshgrid:
-                point = Point(2, [x1, x2])
+                point = Point([x1, x2])
                 distance = constraint.value_at(point)
                 if (self.is_within_margin(distance, 5)):
                     # Z.append(distance)
@@ -134,7 +142,7 @@ class Drawer:
         for x2 in X2_for_graph_before_meshgrid:
             Z = []
             for x1 in X1_for_graph_before_meshgrid:
-                point = Point(2, [x1, x2])
+                point = Point([x1, x2])
                 if (constraint.is_satisfied(point) is True):
                     Z.append(np.nan)
                 else:
@@ -158,22 +166,25 @@ class Drawer:
         plt.axis([min_X, max_X, min_Y, max_Y])
         ax = plt.gca()
         ax.set_autoscale_on(False)
+        ax.grid(True, which='both')
+        ax.axhline(y=0, color='k')
+        ax.axvline(x=0, color='k')
 
         X = np.linspace(min_X, max_X, num=number_of_samples_of_domain)
         X_points = []
         for x in X:
-            new_point = Point(1, [x])
+            new_point = Point([x])
             X_points.append(new_point)
         #Y = [self.function.value_at(x) for x in X]
         #Y = [self.function.value_at(x) for x in X_points]
-        Y = [self.function.value_at(Point(1, [x])) for x in X]
-        plt.plot(X, Y, 'b')
+        Y = [self.function.value_at(Point([x])) for x in X]
+        plt.plot(X, Y, self.twoD_graph_function_colour)
 
         # not drawing 2D constraints in this version
 
         #plt.plot(x_value_of_current_optimum, y_value_of_current_optimum, 'ro')
         for point in self.points:
-            plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), 'ro')
+            plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), self.twoD_graph_point_style)
         plt.xlabel('x')
         plt.ylabel('f(x)')
         #plt.title('Title')
@@ -204,7 +215,7 @@ class Drawer:
         X1, X2 = np.meshgrid(X1_linspace, X2_linspace)
 
         def create_Z(x, y, function):
-            new_point = Point(2, [x, y])
+            new_point = Point([x, y])
             return function.value_at(new_point)
 
         Z = create_Z(X1, X2, self.function)
@@ -228,7 +239,7 @@ class Drawer:
                 for x2 in X2_linspace:
                     Z = []
                     for x1 in X1_linspace:
-                        point = Point(2, [x1, x2])
+                        point = Point([x1, x2])
                         if (constraint.is_satisfied(point) is True):
                             Z.append(np.nan)
                         else:
@@ -283,7 +294,7 @@ class Drawer:
         for x2 in X2_linspace:
             Z = []
             for x1 in X1_linspace:
-                new_point = Point(2, [x1, x2])
+                new_point = Point([x1, x2])
                 Z.append(self.function.value_at(new_point))
             Z_for_graph.append(Z)
         # endregion

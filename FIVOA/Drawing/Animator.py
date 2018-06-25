@@ -13,8 +13,8 @@ class Animator:
         max = value[1] + (value[1] - value[0])
         return widgets.IntRangeSlider(value=value, min = min, max = max, step = step, description = description, disabled = disabled, continuous_update = continuous_update, orientation = orientation, readout = readout, readout_format = readout_format)
 
-    def create_bounded_int_text_box(self, value=150, min=0, max=1000, step=1, description='Text:', disabled=False):
-        return widgets.BoundedIntText(value=value, min=min, max = max, step = step, description=description, disabled = disabled)
+    def create_bounded_int_text_box(self, value=150, min=0, max=1000, step=1, description='Text:', disabled=False, style = {'description_width': 'initial'}):
+        return widgets.BoundedIntText(value=value, min=min, max = max, step = step, description=description, disabled = disabled, style = style)
 
     def create_dropdown(self, options={'Option 1': 'Value 1', 'Option 2': 'Value 2', 'Option 3': 'Value 3'}, value='Value 2', description='Dropdown options:'):
         value = options.values()[0]

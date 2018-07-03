@@ -19,6 +19,7 @@ class HookeJeeves(IAlgorithm):
     #@staticmethod
     def run(self, initial_point):
         #function = open('HookeJeevesOutput.txt', 'w')
+        self.logger = Logger(self.function)
         output_string = ""
         xb = initial_point.copy()
         xp = initial_point.copy()

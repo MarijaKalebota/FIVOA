@@ -4,4 +4,4 @@ class IAlgorithm(object):
         raise NotImplementedError
 
     def get_logger(self):
-        raise NotImplementedError
+        return self.logger

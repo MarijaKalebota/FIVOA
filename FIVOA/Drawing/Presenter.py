@@ -105,6 +105,13 @@ class Presenter:
     def present_contour(self):
         function = self.logger.get_function()
         self.drawer.add_function(function)
+        explicit_constraints = self.logger.get_explicit_constraints()
+        implicit_constraints = self.logger.get_implicit_constraints()
+        for constraint in explicit_constraints:
+            self.drawer.add_constraint(constraint)
+        for constraint in implicit_constraints:
+            self.drawer.add_constraint(constraint)
+
         number_of_iterations = self.logger.get_number_of_iterations()
 
         # region Define colormap choices
@@ -126,9 +133,9 @@ class Presenter:
         X1_range_slider = self.animator.create_int_range_slider(value = self.drawer.get_range_of_variable(0), description= "X1 range:")
         X2_range_slider = self.animator.create_int_range_slider(value = self.drawer.get_range_of_variable(1), description= "X2 range:")
         number_of_samples_of_domain_text_box = self.animator.create_bounded_int_text_box(value=self.drawer.get_number_of_samples_of_domain(), description= "Domain samples:")
-        colormap_choices_dropdown = self.animator.create_dropdown(options=colormap_choices, description= "Colormap choices:")
+        colormap_choices_dropdown = self.animator.create_dropdown(options=colormap_choices, description= "Function colour:")
         constraints_colormap_choices_dropdown = self.animator.create_dropdown(options=constraints_colormap_choices,
-                                                                  description="Constraints colormap choices:")
+                                                                  description="Constraints colour:")
 
         # endregion
 
@@ -138,9 +145,10 @@ class Presenter:
         #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, cmap=cmap_choices)
         # endregion
         # region Display remaining widgets
-        display(play)
-        display(previous_button)
-        display(next_button)
+        hbox = widgets.HBox([play])
+        hbox2 = widgets.HBox([previous_button, next_button])
+        display(hbox)
+        display(hbox2)
         # endregion
 
 
@@ -174,7 +182,7 @@ class Presenter:
         X1_range_slider = self.animator.create_int_range_slider(value = self.drawer.get_range_of_variable(0), description= "X1 range:")
         X2_range_slider = self.animator.create_int_range_slider(value = self.drawer.get_range_of_variable(1), description= "X2 range:")
         number_of_samples_of_domain_text_box = self.animator.create_bounded_int_text_box(value=self.drawer.get_number_of_samples_of_domain(), description= "Domain samples:")
-        colormap_choices_dropdown = self.animator.create_dropdown(options=colormap_choices, description= "Colormap choices:")
+        colormap_choices_dropdown = self.animator.create_dropdown(options=colormap_choices, description= "Function colour:")
         # endregion
 
         interact(self.draw_3D_iteration, iteration_number=iteration_slider, X1_range = X1_range_slider, X2_range = X2_range_slider, number_of_samples_of_domain = number_of_samples_of_domain_text_box, cmap = colormap_choices_dropdown)
@@ -183,9 +191,10 @@ class Presenter:
         #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, cmap=cmap_choices)
         # endregion
         # region Display remaining widgets
-        display(play)
-        display(previous_button)
-        display(next_button)
+        hbox = widgets.HBox([play])
+        hbox2 = widgets.HBox([previous_button, next_button])
+        display(hbox)
+        display(hbox2)
         # endregion
 
 

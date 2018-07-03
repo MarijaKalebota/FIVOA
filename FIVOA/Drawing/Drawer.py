@@ -340,7 +340,7 @@ class Drawer:
         #region Plot all points from internal list
         for point in self.points:
             #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
-            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='g', markeredgecolor='k', marker='o', markersize=5, alpha=1)
         #endregion
 
         plt.show()

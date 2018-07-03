@@ -26,6 +26,9 @@ class Logger(object):
     def get_explicit_constraint(self, index):
         return self.explicit_constraints[index]
 
+    def get_explicit_constraints(self,):
+        return self.explicit_constraints
+
     def get_number_of_explicit_constraints(self):
         return len(self.explicit_constraints)
 
@@ -37,6 +40,9 @@ class Logger(object):
 
     def get_implicit_constraint(self, index):
         return self.inequality_implicit_constraints[index]
+
+    def get_implicit_constraints(self):
+        return self.inequality_implicit_constraints
 
     def get_number_of_implicit_constraints(self):
         return len(self.implicit_constraints)

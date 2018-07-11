@@ -20,18 +20,19 @@ class Presenter:
         self.drawer.set_ranges_of_variables([X1_range, X2_range])
         self.drawer.set_number_of_samples_of_domain(number_of_samples_of_domain)
         self.drawer.set_figure_number(iteration_number)
-        self.drawer.set_2D_graph_function_colour(function_colour)
-        self.drawer.set_2D_graph_point_style(point_style)
+        self.drawer.set_graph_function_colour_2D(function_colour)
+        self.drawer.set_graph_point_style_2D(point_style)
 
         self.drawer.draw_2D_graph()
 
 
-    def draw_3D_iteration(self, iteration_number, X1_range, X2_range, number_of_samples_of_domain, cmap):
+    def draw_3D_iteration(self, iteration_number, X1_range, X2_range, number_of_samples_of_domain, cmap, constraints_cmap):
         self.drawer.clear_points()
         self.drawer.add_point(self.logger.get_iteration(iteration_number).get_current_solution())
         self.drawer.set_ranges_of_variables([X1_range, X2_range])
         self.drawer.set_number_of_samples_of_domain(number_of_samples_of_domain)
-        self.drawer.set_cmap(cmap)
+        self.drawer.set_graph_function_colour_3D_and_contour(cmap)
+        self.drawer.set_graph_constraints_colour(constraints_cmap)
         self.drawer.set_figure_number(iteration_number)
 
         self.drawer.draw_3D_graph()
@@ -41,8 +42,8 @@ class Presenter:
         self.drawer.add_point(self.logger.get_iteration(iteration_number).get_current_solution())
         self.drawer.set_ranges_of_variables([X1_range, X2_range])
         self.drawer.set_number_of_samples_of_domain(number_of_samples_of_domain)
-        self.drawer.set_cmap(cmap)
-        self.drawer.set_constraints_cmap(constraints_cmap)
+        self.drawer.set_graph_function_colour_3D_and_contour(cmap)
+        self.drawer.set_graph_constraints_colour(constraints_cmap)
         self.drawer.set_figure_number(iteration_number)
 
         self.drawer.draw_contour_graph()
@@ -89,7 +90,7 @@ class Presenter:
                  X2_range=X2_range_slider, number_of_samples_of_domain=number_of_samples_of_domain_text_box, function_colour = function_colour_options_dropdown, point_style = point_style_options_dropdown)
 
         # region Call the function interactively
-        # interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, cmap=cmap_choices)
+        # interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, graph_function_colour_3D_and_contour=cmap_choices)
         # endregion
         # region Display remaining widgets
         #display(play)
@@ -116,7 +117,7 @@ class Presenter:
 
         # region Define colormap choices
         colormap_choices = {
-            'GnBu': 'GnBu',
+            'Green-blue (GnBu)': 'GnBu',
             'Greens': 'Greens'}  # ,
 
         constraints_colormap_choices = {
@@ -142,7 +143,7 @@ class Presenter:
         interact(self.draw_contour_iteration, iteration_number=iteration_slider, X1_range = X1_range_slider, X2_range = X2_range_slider, number_of_samples_of_domain = number_of_samples_of_domain_text_box, cmap = colormap_choices_dropdown, constraints_cmap = constraints_colormap_choices_dropdown)
 
         # region Call the function interactively
-        #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, cmap=cmap_choices)
+        #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, graph_function_colour_3D_and_contour=cmap_choices)
         # endregion
         # region Display remaining widgets
         hbox = widgets.HBox([play])
@@ -156,21 +157,26 @@ class Presenter:
     def present_3D(self):
         function = self.logger.get_function()
         self.drawer.add_function(function)
+        for constraint in self.logger.get_implicit_constraints():
+            self.drawer.add_constraint(constraint)
+        for constraint in self.logger.get_explicit_constraints():
+            self.drawer.add_constraint(constraint)
         number_of_iterations = self.logger.get_number_of_iterations()
 
         # region Define colormap choices
         colormap_choices = {
             'Accent': 'Accent',
-            'Accent_r': 'Accent_r'}  # ,
-
-        '''
+            'Accent_r': 'Accent_r',#}  # ,
             'Blues': 'Blues',
             'Blues_r': 'Blues_r',
             'BrBG' : 'BrBG',
             'BrBG_r' : 'BrBG_r',
             'BuGn' : 'BuGn',
             'BuGn_r' : 'BuGn_r'
-        }'''
+        }#"'''
+        constraints_colormap_choices = {
+            'autumn': 'autumn',
+            'copper': 'copper'}
         # endregion
 
         # region Create and link widgets
@@ -183,12 +189,14 @@ class Presenter:
         X2_range_slider = self.animator.create_int_range_slider(value = self.drawer.get_range_of_variable(1), description= "X2 range:")
         number_of_samples_of_domain_text_box = self.animator.create_bounded_int_text_box(value=self.drawer.get_number_of_samples_of_domain(), description= "Domain samples:")
         colormap_choices_dropdown = self.animator.create_dropdown(options=colormap_choices, description= "Function colour:")
+        constraints_colormap_choices_dropdown = self.animator.create_dropdown(options=constraints_colormap_choices,
+                                                                              description="Constraints colour:")
         # endregion
 
-        interact(self.draw_3D_iteration, iteration_number=iteration_slider, X1_range = X1_range_slider, X2_range = X2_range_slider, number_of_samples_of_domain = number_of_samples_of_domain_text_box, cmap = colormap_choices_dropdown)
+        interact(self.draw_3D_iteration, iteration_number=iteration_slider, X1_range = X1_range_slider, X2_range = X2_range_slider, number_of_samples_of_domain = number_of_samples_of_domain_text_box, cmap = colormap_choices_dropdown, constraints_cmap = constraints_colormap_choices_dropdown)
 
         # region Call the function interactively
-        #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, cmap=cmap_choices)
+        #interact(self.drawer.draw_3D_graph, iteration_number=iteration_slider, graph_function_colour_3D_and_contour=cmap_choices)
         # endregion
         # region Display remaining widgets
         hbox = widgets.HBox([play])

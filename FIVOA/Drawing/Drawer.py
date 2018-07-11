@@ -34,16 +34,17 @@ class Drawer:
     #def __init__(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
     def __init__(self):
         self.points = []
+        self.vectors = []
         self.constraints = []
         self.number_of_samples_of_domain = 150
         self.ranges_of_variables = [ [-10, 10],
                                      [-15, 15]
                                      ]
-        self.cmap = 'Accent'
-        self.constraints_colormap = 'autumn'
+        self.graph_function_colour_3D_and_contour = 'Accent'
+        self.graph_constraints_colour = 'autumn'
         self.figure_number = 0
-        self.twoD_graph_function_colour = 'b'
-        self.twoD_graph_point_style = 'go'
+        self.graph_function_colour_2D = 'b'
+        self.graph_point_style_2D = 'go'
 
     def add_function(self, function):
         self.function = function
@@ -54,8 +55,17 @@ class Drawer:
     def clear_points(self):
         self.points = []
 
+    def add_vector(self, vector):
+        self.vectors.append(vector)
+
+    def clear_vectors(self):
+        self.vectors = []
+
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
+
+    def clear_constraints(self):
+        self.constraints = []
 
     def set_ranges_of_variables(self, ranges):
         self.ranges_of_variables = ranges
@@ -70,17 +80,17 @@ class Drawer:
     def get_number_of_samples_of_domain(self):
         return self.number_of_samples_of_domain
 
-    def set_cmap(self, cmap):
-        self.cmap = cmap
+    def set_graph_function_colour_3D_and_contour(self, cmap):
+        self.graph_function_colour_3D_and_contour = cmap
 
-    def set_constraints_cmap(self, cmap):
-        self.constraints_colormap = cmap
+    def set_graph_constraints_colour(self, cmap):
+        self.graph_constraints_colour = cmap
 
-    def set_2D_graph_function_colour(self, colour):
-        self.twoD_graph_function_colour = colour
+    def set_graph_function_colour_2D(self, colour):
+        self.graph_function_colour_2D = colour
 
-    def set_2D_graph_point_style(self, point_style):
-        self.twoD_graph_point_style = point_style
+    def set_graph_point_style_2D(self, point_style):
+        self.graph_point_style_2D = point_style
 
     def set_figure_number(self, fig_num):
         self.figure_number = fig_num
@@ -129,7 +139,7 @@ class Drawer:
             for x1 in X1_for_graph_before_meshgrid:
                 point = Point([x1, x2])
                 distance = constraint.value_at(point)
-                if (self.is_within_margin(distance, 5)):
+                if (self.is_within_margin(distance, 0.5)):
                     # Z.append(distance)
                     Z.append(self.function.value_at(point))
                 else:
@@ -178,13 +188,13 @@ class Drawer:
         #Y = [self.function.value_at(x) for x in X]
         #Y = [self.function.value_at(x) for x in X_points]
         Y = [self.function.value_at(Point([x])) for x in X]
-        plt.plot(X, Y, self.twoD_graph_function_colour)
+        plt.plot(X, Y, self.graph_function_colour_2D)
 
         # not drawing 2D constraints in this version
 
         #plt.plot(x_value_of_current_optimum, y_value_of_current_optimum, 'ro')
         for point in self.points:
-            plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), self.twoD_graph_point_style)
+            plt.plot(point.get_value_at_dimension(0), self.function.value_at(point), self.graph_point_style_2D)
         plt.xlabel('x')
         plt.ylabel('f(x)')
         #plt.title('Title')
@@ -196,8 +206,8 @@ class Drawer:
         plt.close('all')
         #TODO need this?
         #plt.figure(iteration)
-        cmap = self.cmap
-        constraints_cmap = self.constraints_colormap
+        cmap = self.graph_function_colour_3D_and_contour
+        constraints_cmap = self.graph_constraints_colour
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
         min_X2 = self.ranges_of_variables[1][0]
@@ -225,13 +235,11 @@ class Drawer:
         plt.imshow(Z, extent=[min_X1, max_X1, min_X2, max_X2], origin='lower', cmap=cmap, alpha=1)
         plt.colorbar();
 
-        #plt.contourf(X1, X2, Z, 20, cmap='RdGy')
+        #plt.contourf(X1, X2, Z, 20, graph_function_colour_3D_and_contour='RdGy')
         #plt.colorbar();
 
-        #TODO constraints
-
         data_of_constraints = []
-
+        #region Plot constraints
         for constraint in self.constraints:
             if self.is_inequality_implicit_constraint(constraint):
                 data_of_current_constraint = []
@@ -246,14 +254,35 @@ class Drawer:
                             Z.append(constraint.value_at(point))
                     Z_of_constraint.append(Z)
                 X1_of_constraint, X2_of_constraint = np.meshgrid(X1_linspace, X2_linspace)
-
                 # plot_this_constraint
                 plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap=constraints_cmap, alpha=alpha_value)
                 plt.colorbar();
+            else:
+                #TODO EQUALITY
+                pass
+        #endregion
 
+        #region Plot all points
         #plt.plot(xRjesenja[iteration], yRjesenja[iteration], 'go')
         for point in self.points:
             plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'go')
+        #endregion
+
+        #region Plot all vectors
+        for vector in self.vectors:
+            x1_dimensions = []
+            x1_dimensions.append(vector.get_start_point().get_value_at_dimension(0))
+            x1_dimensions.append(vector.get_end_point().get_value_at_dimension(0))
+            x2_dimensions = []
+            x2_dimensions.append(vector.get_start_point().get_value_at_dimension(1))
+            x2_dimensions.append(vector.get_end_point().get_value_at_dimension(1))
+
+            plt.plot(x1_dimensions, x2_dimensions, 'k')
+            # mark the beginning of the vector with a circle
+            plt.plot(vector.get_start_point().get_value_at_dimension(0), vector.get_start_point().get_value_at_dimension(1), 'ko', markersize=3)
+            #mark the end of the vector with a triangle
+            #plt.plot(vector.get_end_point().get_value_at_dimension(0), vector.get_end_point().get_value_at_dimension(1), 'kd', markersize = 4)
+        #endregion
         plt.show()
 
     def is_inequality_implicit_constraint(self, constraint):
@@ -270,15 +299,18 @@ class Drawer:
                 return True
         return False
 
-    #def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, cmap):
-    #def draw_3D_graph(self, cmap):
+    #def draw_3D_graph(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain, graph_function_colour_3D_and_contour):
+    #def draw_3D_graph(self, graph_function_colour_3D_and_contour):
     def draw_3D_graph(self):
         plt.clf()
         plt.close('all')
-        plt.figure(self.figure_number)
-        ax = plt.axes(projection='3d')
+        fig = plt.figure(self.figure_number)
+        #ax = plt.axes(projection='3d')
+        ax = fig.gca(projection='3d')
 
-        cmap = self.cmap
+        cmap = self.graph_function_colour_3D_and_contour
+        constraints_cmap = self.graph_constraints_colour
+
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
         min_X2 = self.ranges_of_variables[1][0]
@@ -312,7 +344,7 @@ class Drawer:
                             pass
                         else:
                             Z_for_graph[i][j] = np.nan
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=constraints_cmap)
 
             elif self.is_inequality_implicit_constraint(constraint):
                 Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
@@ -323,7 +355,7 @@ class Drawer:
                             pass
                         else:
                             Z_for_graph[i][j] = np.nan
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap='autumn')
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=constraints_cmap)
             else: #TODO explicit constraints?
                 pass
 
@@ -336,12 +368,39 @@ class Drawer:
         ax.set_ylabel('x2')
         ax.set_zlabel('z')
         #endregion
-
+        x = []
+        y = []
+        z = []
         #region Plot all points from internal list
         for point in self.points:
-            #ax.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point.get_value_at_dimension(2), markerfacecolor='k', markeredgecolor='k', marker='o', markersize=5, alpha=1)
             ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='g', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+            #ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='r', markeredgecolor='k', marker='^', markersize=2, alpha=1)
+            #ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)])
+            #x.append([point.get_value_at_dimension(0)])
+            #y.append([point.get_value_at_dimension(1)])
+            #z.append(self.function.value_at(point))
         #endregion
+
+            # region Plot all vectors
+        for vector in self.vectors:
+            x1_dimensions = []
+            x1_dimensions.append(vector.get_start_point().get_value_at_dimension(0))
+            x1_dimensions.append(vector.get_end_point().get_value_at_dimension(0))
+            x2_dimensions = []
+            x2_dimensions.append(vector.get_start_point().get_value_at_dimension(1))
+            x2_dimensions.append(vector.get_end_point().get_value_at_dimension(1))
+            z_dimensions = []
+            z_dimensions.append(vector.get_start_point().get_value_at_dimension(2))
+            z_dimensions.append(vector.get_end_point().get_value_at_dimension(2))
+
+            plt.plot(x1_dimensions, x2_dimensions, z_dimensions, 'k')
+            # mark the beginning of the vector with a circle
+            plt.plot([vector.get_start_point().get_value_at_dimension(0)], [vector.get_start_point().get_value_at_dimension(1)], [vector.get_start_point().get_value_at_dimension(2)], 'ko', markersize=3)
+            # mark the end of the vector with a triangle
+            #plt.plot([vector.get_end_point().get_value_at_dimension(0)], [vector.get_end_point().get_value_at_dimension(1)], [vector.get_end_point().get_value_at_dimension(2)], 'kd', markersize=4)
+        # endregion
+
+        #ax.plot(x, y, z)
 
         plt.show()
 

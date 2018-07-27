@@ -32,7 +32,7 @@ class Presenter:
         self.drawer.set_ranges_of_variables([X1_range, X2_range])
         self.drawer.set_number_of_samples_of_domain(number_of_samples_of_domain)
         self.drawer.set_graph_function_colour_3D_and_contour(cmap)
-        self.drawer.set_graph_constraints_colour(constraints_cmap)
+        self.drawer.set_graph_inequality_constraints_colour(constraints_cmap)
         self.drawer.set_figure_number(iteration_number)
 
         self.drawer.draw_3D_graph()
@@ -43,7 +43,7 @@ class Presenter:
         self.drawer.set_ranges_of_variables([X1_range, X2_range])
         self.drawer.set_number_of_samples_of_domain(number_of_samples_of_domain)
         self.drawer.set_graph_function_colour_3D_and_contour(cmap)
-        self.drawer.set_graph_constraints_colour(constraints_cmap)
+        self.drawer.set_graph_inequality_constraints_colour(constraints_cmap)
         self.drawer.set_figure_number(iteration_number)
 
         self.drawer.draw_contour_graph()

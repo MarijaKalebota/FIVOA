@@ -34,32 +34,49 @@ class Drawer:
     #def __init__(self, min_X1, max_X1, min_X2, max_X2, number_of_samples_of_domain):
     def __init__(self):
         self.points = []
+        self.graph_point_colours = []
+        self.graph_point_shapes = []
         self.vectors = []
+        self.graph_vector_colours = []
+        self.graph_vector_start_shapes = []
+        self.graph_vector_end_shapes = []
         self.constraints = []
         self.number_of_samples_of_domain = 150
         self.ranges_of_variables = [ [-10, 10],
                                      [-15, 15]
                                      ]
         self.graph_function_colour_3D_and_contour = 'Accent'
-        self.graph_constraints_colour = 'autumn'
+        self.graph_inequality_constraints_colour = 'autumn'
+        self.graph_equality_constraints_colour = 'summer'
         self.figure_number = 0
         self.graph_function_colour_2D = 'b'
         self.graph_point_style_2D = 'go'
+        self.margin = 0.5
 
     def add_function(self, function):
         self.function = function
 
-    def add_point(self, point):
+    def add_point(self, point, colour = 'k', shape = 'o'):
         self.points.append(point)
+        self.graph_point_colours.append(colour)
+        self.graph_point_shapes.append(shape)
 
     def clear_points(self):
         self.points = []
+        self.graph_point_colours = []
+        self.graph_point_shapes = []
 
-    def add_vector(self, vector):
+    def add_vector(self, vector, colour = 'k', start_shape = 'o', end_shape = ''):
         self.vectors.append(vector)
+        self.graph_vector_colours.append(colour)
+        self.graph_vector_start_shapes.append(start_shape)
+        self.graph_vector_end_shapes.append(end_shape)
 
     def clear_vectors(self):
         self.vectors = []
+        self.graph_vector_colours = []
+        self.graph_vector_end_shapes = []
+        self.graph_vector_end_shapes = []
 
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
@@ -83,8 +100,11 @@ class Drawer:
     def set_graph_function_colour_3D_and_contour(self, cmap):
         self.graph_function_colour_3D_and_contour = cmap
 
-    def set_graph_constraints_colour(self, cmap):
-        self.graph_constraints_colour = cmap
+    def set_graph_inequality_constraints_colour(self, cmap):
+        self.graph_inequality_constraints_colour = cmap
+
+    def set_graph_equality_constraints_colour(self, cmap):
+        self.graph_equality_constraints_colour = cmap
 
     def set_graph_function_colour_2D(self, colour):
         self.graph_function_colour_2D = colour
@@ -94,6 +114,9 @@ class Drawer:
 
     def set_figure_number(self, fig_num):
         self.figure_number = fig_num
+
+    def set_margin(self, margin):
+        self.margin = margin
 
     def is_within_margin(self, value, margin):
         if abs(value) <= margin:
@@ -207,7 +230,8 @@ class Drawer:
         #TODO need this?
         #plt.figure(iteration)
         cmap = self.graph_function_colour_3D_and_contour
-        constraints_cmap = self.graph_constraints_colour
+        inequality_constraints_cmap = self.graph_inequality_constraints_colour
+        equality_constraints_cmap = self.graph_equality_constraints_colour
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
         min_X2 = self.ranges_of_variables[1][0]
@@ -255,21 +279,36 @@ class Drawer:
                     Z_of_constraint.append(Z)
                 X1_of_constraint, X2_of_constraint = np.meshgrid(X1_linspace, X2_linspace)
                 # plot_this_constraint
-                plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap=constraints_cmap, alpha=alpha_value)
+                plt.contourf(X1_of_constraint, X2_of_constraint, Z_of_constraint, 20, cmap=inequality_constraints_cmap, alpha=alpha_value)
                 plt.colorbar();
-            else:
-                #TODO EQUALITY
-                pass
+            elif self.is_equality_implicit_constraint(constraint):
+                Z_of_constraint = self.create_graph_data_for_equality_implicit_constraint(X1_linspace, X2_linspace,
+                                                                                          constraint)
+                for i in range(len(Z)):
+                    for j in range(len(Z[i])):
+                        if np.isnan(Z_of_constraint[i][j]):
+                            # Z should stay as it is
+                            pass
+                        else:
+                            Z[i][j] = np.nan
+                plt.contourf(X1_linspace, X2_linspace, Z_of_constraint, 50, cmap = equality_constraints_cmap)
+                plt.colorbar();
         #endregion
 
         #region Plot all points
         #plt.plot(xRjesenja[iteration], yRjesenja[iteration], 'go')
-        for point in self.points:
-            plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'go')
+        #for point in self.points:
+            #plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), 'go')
+        for i in range(len(self.points)):
+            point = self.points[i]
+            point_style = self.graph_point_colours[i] + self.graph_point_shapes[i]
+            plt.plot(point.get_value_at_dimension(0), point.get_value_at_dimension(1), point_style)
         #endregion
 
         #region Plot all vectors
-        for vector in self.vectors:
+        #for vector in self.vectors:
+        for i in range(len(self.vectors)):
+            vector = self.vectors[i]
             x1_dimensions = []
             x1_dimensions.append(vector.get_start_point().get_value_at_dimension(0))
             x1_dimensions.append(vector.get_end_point().get_value_at_dimension(0))
@@ -277,11 +316,18 @@ class Drawer:
             x2_dimensions.append(vector.get_start_point().get_value_at_dimension(1))
             x2_dimensions.append(vector.get_end_point().get_value_at_dimension(1))
 
-            plt.plot(x1_dimensions, x2_dimensions, 'k')
-            # mark the beginning of the vector with a circle
-            plt.plot(vector.get_start_point().get_value_at_dimension(0), vector.get_start_point().get_value_at_dimension(1), 'ko', markersize=3)
-            #mark the end of the vector with a triangle
+            #plt.plot(x1_dimensions, x2_dimensions, 'k')
+            plt.plot(x1_dimensions, x2_dimensions, self.graph_vector_colours[i])
+            print self.graph_vector_colours[i]
+            # mark the beginning of the vector
+            vector_start_style = self.graph_vector_colours[i] + self.graph_vector_start_shapes[i]
+            print vector_start_style
+            #plt.plot(vector.get_start_point().get_value_at_dimension(0), vector.get_start_point().get_value_at_dimension(1), 'ko', markersize=3)
+            plt.plot(vector.get_start_point().get_value_at_dimension(0), vector.get_start_point().get_value_at_dimension(1), vector_start_style, markersize=3)
+            #mark the end of the vector
             #plt.plot(vector.get_end_point().get_value_at_dimension(0), vector.get_end_point().get_value_at_dimension(1), 'kd', markersize = 4)
+            vector_end_style = self.graph_vector_colours[i] + self.graph_vector_end_shapes[i]
+            plt.plot(vector.get_end_point().get_value_at_dimension(0), vector.get_end_point().get_value_at_dimension(1), vector_end_style, markersize=4)
         #endregion
         plt.show()
 
@@ -309,7 +355,8 @@ class Drawer:
         ax = fig.gca(projection='3d')
 
         cmap = self.graph_function_colour_3D_and_contour
-        constraints_cmap = self.graph_constraints_colour
+        inequality_constraints_cmap = self.graph_inequality_constraints_colour
+        equality_constraints_cmap = self.graph_equality_constraints_colour
 
         min_X1 = self.ranges_of_variables[0][0]
         max_X1 = self.ranges_of_variables[0][1]
@@ -344,7 +391,7 @@ class Drawer:
                             pass
                         else:
                             Z_for_graph[i][j] = np.nan
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=constraints_cmap)
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=equality_constraints_cmap)
 
             elif self.is_inequality_implicit_constraint(constraint):
                 Z_of_constraint = self.create_graph_data_for_inequality_implicit_constraint(X1_linspace, X2_linspace, constraint)
@@ -355,7 +402,7 @@ class Drawer:
                             pass
                         else:
                             Z_for_graph[i][j] = np.nan
-                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=constraints_cmap)
+                ax.contour3D(X1_for_graph, X2_for_graph, Z_of_constraint, 50, cmap=inequality_constraints_cmap)
             else: #TODO explicit constraints?
                 pass
 
@@ -372,17 +419,25 @@ class Drawer:
         y = []
         z = []
         #region Plot all points from internal list
-        for point in self.points:
-            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='g', markeredgecolor='k', marker='o', markersize=5, alpha=1)
+        #for point in self.points:
+            #ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='g', markeredgecolor='k', marker='o', markersize=5, alpha=1)
             #ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)], markerfacecolor='r', markeredgecolor='k', marker='^', markersize=2, alpha=1)
             #ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)], [self.function.value_at(point)])
             #x.append([point.get_value_at_dimension(0)])
             #y.append([point.get_value_at_dimension(1)])
             #z.append(self.function.value_at(point))
+
+        for i in range(len(self.points)):
+            point = self.points[i]
+            ax.plot([point.get_value_at_dimension(0)], [point.get_value_at_dimension(1)],
+                    [self.function.value_at(point)], markerfacecolor=self.graph_point_colours[i], markeredgecolor='k', marker=self.graph_point_shapes[i], markersize=5,
+                    alpha=1)
         #endregion
 
             # region Plot all vectors
-        for vector in self.vectors:
+        #for vector in self.vectors:
+        for i in range(len(self.vectors)):
+            vector = self.vectors[i]
             x1_dimensions = []
             x1_dimensions.append(vector.get_start_point().get_value_at_dimension(0))
             x1_dimensions.append(vector.get_end_point().get_value_at_dimension(0))
@@ -393,11 +448,20 @@ class Drawer:
             z_dimensions.append(vector.get_start_point().get_value_at_dimension(2))
             z_dimensions.append(vector.get_end_point().get_value_at_dimension(2))
 
-            plt.plot(x1_dimensions, x2_dimensions, z_dimensions, 'k')
-            # mark the beginning of the vector with a circle
-            plt.plot([vector.get_start_point().get_value_at_dimension(0)], [vector.get_start_point().get_value_at_dimension(1)], [vector.get_start_point().get_value_at_dimension(2)], 'ko', markersize=3)
-            # mark the end of the vector with a triangle
+            #plt.plot(x1_dimensions, x2_dimensions, z_dimensions, 'k')
+            plt.plot(x1_dimensions, x2_dimensions, z_dimensions, self.graph_vector_colours[i])
+            # mark the beginning of the vector
+            vector_start_style = self.graph_vector_colours[i] + self.graph_vector_start_shapes[i]
+            #plt.plot([vector.get_start_point().get_value_at_dimension(0)], [vector.get_start_point().get_value_at_dimension(1)], [vector.get_start_point().get_value_at_dimension(2)], 'ko', markersize=3)
+            plt.plot([vector.get_start_point().get_value_at_dimension(0)],
+                     [vector.get_start_point().get_value_at_dimension(1)],
+                     [vector.get_start_point().get_value_at_dimension(2)], vector_start_style, markersize=3)
+            # mark the end of the vector
+            vector_end_style = self.graph_vector_colours[i] + self.graph_vector_end_shapes[i]
             #plt.plot([vector.get_end_point().get_value_at_dimension(0)], [vector.get_end_point().get_value_at_dimension(1)], [vector.get_end_point().get_value_at_dimension(2)], 'kd', markersize=4)
+            plt.plot([vector.get_end_point().get_value_at_dimension(0)],
+                     [vector.get_end_point().get_value_at_dimension(1)],
+                     [vector.get_end_point().get_value_at_dimension(2)], vector_end_style, markersize=4)
         # endregion
 
         #ax.plot(x, y, z)
